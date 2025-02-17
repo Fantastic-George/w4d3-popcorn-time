@@ -1,0 +1,172 @@
+<style type="text/css">
+    .mc_embed_signup {
+        background: rgba(255, 255, 255, 0);
+        clear: left;
+        font: 14px Helvetica, Arial, sans-serif;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    .button1 {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+        font: Helvetica;
+    }
+
+    .element {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Update input and button styles */
+    .form-input,
+    .form-submit {
+        width: 100% !important;
+        max-width: 100% !important;
+        position: static !important;
+        left: 0 !important;
+        box-sizing: border-box;
+    }
+
+    /* New styles for success message */
+    .status-message {
+        margin-top: 20px;
+        padding: 15px;
+        text-align: center;
+        min-height: 50px;
+    }
+
+    .success-message {
+        color: #28a745;
+        font-size: 22px;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 22px;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        display: inline-block;
+    }
+</style>
+
+<div class="mc_embed_signup element">
+    <br><br>
+
+    <input type="text" class="button1 form-input fname-input" value="" placeholder="First Name" name="FNAME"
+        style="height:45px; background-color:#ffffff; border: none; font-size: 18px; text-align: center;" required>
+
+    <br><br>
+    <input type="email" class="button1 form-input email-input" value="" placeholder="Email" name="EMAIL"
+        style="height:45px; background-color:#ffffff; border: none; font-size: 18px; text-align: center;" required>
+
+    <div>
+        <br>
+    </div>
+
+    <div class="clear">
+        <input type="submit"
+            style="height:45px; font-size:18px; background-color:#88c545; color: white; border: none; font-weight: bold; text-align: center;"
+            value="Secure Launch Day Deal" class="button button1 form-submit">
+    </div>
+
+    <div class="status-message"></div>
+</div>
+
+<script>
+    class EmailSignupForm {
+        constructor(formElement) {
+            this.form = formElement;
+            this.fname = this.form.querySelector('.fname-input');
+            this.email = this.form.querySelector('.email-input');
+            this.submit = this.form.querySelector('.form-submit');
+            this.statusMessage = this.form.querySelector('.status-message');
+
+            this.urlRef = '';
+            this.testYesNo = '';
+
+            this.init();
+        }
+
+        init() {
+            this.getURLParams();
+            this.submit.addEventListener('click', () => this.handleSubmit());
+        }
+
+        getURLParams() {
+            const params = new URLSearchParams(window.location.search);
+            this.urlRef = params.get('tag') || params.get('ref') || '';
+            this.testYesNo = params.get('test') ? 'test=yes' : '';
+
+            if (this.urlRef) {
+                const referrer = document.referrer;
+                fetch(`https://marblelous.tech/PHP/visitor.php?ref=${this.urlRef}&referer=${referrer}`);
+            }
+        }
+
+        validateEmail(email) {
+            return email.match(
+                /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+        }
+
+        async handleSubmit() {
+            const email = this.email.value;
+            const fname = this.fname.value;
+
+            if (this.validateEmail(email)) {
+                // Send the request - no need for try/catch here since the submission 
+                // should be considered successful even if the fetch has network issues
+                fetch(`https://www.marblelous.tech/PHP/MCnewYG.php?email=${email}&fname=${fname}&pw=p@ssw0rd&ref=${this.urlRef}&${this.testYesNo}`);
+
+                // Clear the form
+                this.email.value = '';
+                this.fname.value = '';
+
+                // Show success message
+                this.showStatus('Thank you for subscribing!', 'success');
+
+                // Log to console for debugging
+                console.log('Subscription successful');
+            } else {
+                this.showStatus('Invalid email format!', 'error');
+            }
+        }
+
+        showStatus(message, type) {
+            // Clear any existing content
+            this.statusMessage.innerHTML = '';
+
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+
+            // Add to status message container
+            this.statusMessage.appendChild(messageDiv);
+
+            // Ensure the status message is visible
+            this.statusMessage.style.display = 'block';
+
+            // Log for debugging
+            console.log('Status message displayed:', message, type);
+        }
+    }
+
+    // Initialize all forms on the page
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.mc_embed_signup').forEach(form => {
+            new EmailSignupForm(form);
+        });
+    });
+</script>
